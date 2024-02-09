@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import App from '../App';
+import UserDetail from '../page/user';
 
 
 export default function RouteProvider() {
@@ -7,7 +8,7 @@ export default function RouteProvider() {
         <div>
             <Routes>
                 <Route path="/" element={<App />} />
-                <Route path="/about" element={<div>About</div>} />
+                <Route path="/user/:id" element={<UserDetail />} />
             </Routes>
         </div>
     )
