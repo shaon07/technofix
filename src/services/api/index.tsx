@@ -38,7 +38,7 @@ function useApi<T>(defaultBearerToken?: string): ApiResponse<T> {
 
     const request = (options: ApiRequestOptions<T>) => {
         const { method, url, data, options: axiosOptions, bearerToken, contentType, cacheExpiry = 300000 } = options;
-        const headers: any = { 'Content-Type': contentType || 'multipart/form-data' };
+        const headers: any = { 'Content-Type': 'application/json' };
 
         if (bearerToken) {
             headers.Authorization = `Bearer ${bearerToken}`;
@@ -46,9 +46,9 @@ function useApi<T>(defaultBearerToken?: string): ApiResponse<T> {
             headers.Authorization = `Bearer ${defaultToken}`;
         }
 
-        if (contentType && contentType === 'multipart/form-data') {
-            headers['Content-Type'] = 'multipart/form-data';
-        }
+        // if (contentType && contentType === 'application/json') {
+        //     headers['Content-Type'] = 'application/json';
+        // }
 
         const cacheKey = `${method}-${url}`;
         const cachedData = sessionStorage.getItem(cacheKey);
