@@ -1,29 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import useApi from "../../services/api";
 import { styles } from "../../styles/tailwind/detailPage/index.css";
 
 export default function UserDetail() {
     const { id } = useParams();
-    const { data, error, loading, request } = useApi();
+    const [data, setData] = useState<any>({});
 
     useEffect(() => {
-        request({
-            url: `users/${id}`,
-            method: 'GET',
-        })
+        (async () => {
+            const data = await axios.get(`https://dummyjson.com/users/${id}`);
+
+            if (data.status === 200) {
+                setData(data.data);
+            }
+        })()
     }, [id]);
 
-    if (loading) {
-        return <h1>Loading...</h1>
-    }
 
-    if (error) {
-        return <h1>
-            {JSON.stringify(error)}
-        </h1>
-    }
 
     return (
         <div className={`${styles.container}`}>
