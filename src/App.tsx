@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormEvent, useEffect, useState } from 'react';
 import './App.css';
-import Card from './components/card';
 import Navbar from './components/navbar';
-import useApi from './services/api';
 
+import axios from 'axios';
 import { Modal } from 'flowbite-react';
+import Card from './components/card';
 
 function App() {
-  const { data, error, loading, request } = useApi();
+  const [userList, setUserList] = useState<any>([]);
+
   const [searchUserName, setSearchUserName] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [openModal, setOpenModal] = useState(false);
@@ -31,31 +32,31 @@ function App() {
   });
 
   useEffect(() => {
-    request({
-      url: 'users',
-      method: 'GET',
-    })
-  }, []);
+    (async () => {
+      const data = await axios.get(`https://dummyjson.com/users`);
 
-  if (loading) {
-    return <h1>Loading...</h1>
-  }
+      if (data.status === 200) {
+        setUserList(data.data.users)
+
+      }
+    })()
+  }, [])
 
 
-  if (error) {
-    return <h1>
-      {JSON.stringify(error)}
-    </h1>
-  }
+
+
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(formData)
-    request({
-      url: `users/add`,
-      method: 'POST',
-      data: JSON.stringify(formData)
-    })
+
+    const data = await axios.post('https://dummyjson.com/users/add', formData)
+    console.log("🚀 ~ handleSubmit ~ data:", data)
+
+    if (data.status === 200) {
+      setUserList([...userList, data.data].reverse());
+      setOpenModal(false)
+    }
+
   }
 
   return (
@@ -87,8 +88,8 @@ function App() {
       {
         openModal && <div className='fixed top-0 left-0 right-0 bottom-0  bg-black bg-opacity-50 flex justify-center items-center cursor-pointer z-0' >
           <div>
-            <Modal show={openModal} onClose={() => setOpenModal(false)}>
-              <Modal.Body className='p-3'>
+            <Modal className='max-w-[500px] mx-auto' show={openModal} onClose={() => setOpenModal(false)}>
+              <Modal.Body className='p-3 mx-auto'>
 
                 <form onSubmit={handleSubmit}>
                   <div className="grid gap-6 mb-6 md:grid-cols-2">
@@ -144,7 +145,7 @@ function App() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {
-          data?.users.filter((user: any) => user.username.toLowerCase().includes(searchUserName.toLocaleLowerCase())).sort((a: any, b: any) => {
+          userList?.filter((user: any) => user.username.toLowerCase().includes(searchUserName.toLocaleLowerCase())).sort((a: any, b: any) => {
             if (sortBy === 'name') {
               const nameA = a.firstName.toLowerCase();
               const nameB = b.firstName.toLowerCase();
